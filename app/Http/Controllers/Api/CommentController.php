@@ -127,6 +127,18 @@ class CommentController extends Controller
         ]);
     }
 
+    /**
+     * Deletes the specified comment from the specific story from the database.
+     * 
+     * This method fetches the specified comment and deletes it from the database
+     * permanently.
+     * 
+     * @param \App\Models\Comment $comment
+     * The $comment model instance about to be deleted.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON response with a success message.
+     */
     public function destroy(Comment $comment) : JsonResponse
     {
         $comment->delete();
@@ -136,7 +148,21 @@ class CommentController extends Controller
         ]);
     }
 
-    public function report(Request $request, Comment $comment)
+    /**
+     * Report the specified comment.
+     * 
+     * This method validates if the data for submitting the report is valid,
+     * then fetches the comment and adds it and the report to the 'CommentsReports' pivot table.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * The HTTP request to report the comment.
+     * @param \App\Models\Comment $comment
+     * The $comment model instance to be reported
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns either a success or error message with the corresponding codes.
+     */
+    public function report(Request $request, Comment $comment) : JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'reason' => 'required|string|max:255',
