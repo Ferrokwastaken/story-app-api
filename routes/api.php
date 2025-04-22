@@ -36,6 +36,7 @@ Route::apiResource('tags', TagController::class);
 // comment actions like store, update and destroy.
 Route::resource('stories/{story}/comments', CommentController::class)->shallow();
 
-// Both of these routes handle reporting both a comment and a story
+// These routes handle reporting both a comment and a story
 Route::post('comments/{comment}/report', [CommentController::class, 'report'])->name('comments.report');
 Route::post('stories/{story}/report', [StoryController::class, 'report'])->name('stories.report');
+Route::apiResource('reports', ReportController::class);
