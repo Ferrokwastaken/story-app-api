@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Story;
+use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -29,7 +30,7 @@ class StoryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON containing the relevant data
      */
-    public function index(Request $request) : JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $query = Story::with('category', 'tags');
 
@@ -64,7 +65,7 @@ class StoryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON containing the relevant data
      */
-    public function store(Request $request) : JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
@@ -114,7 +115,7 @@ class StoryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON with the relevant data.
      */
-    public function show(Story $story) : JsonResponse
+    public function show(Story $story): JsonResponse
     {
         $story->load('category', 'tags', 'comments');
         return response()->json([
@@ -138,7 +139,7 @@ class StoryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON with the updated story
      */
-    public function update(Request $request, Story $story) : JsonResponse
+    public function update(Request $request, Story $story): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
@@ -179,7 +180,7 @@ class StoryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON with a success message.
      */
-    public function destroy(Story $story) : JsonResponse
+    public function destroy(Story $story): JsonResponse
     {
         $story->delete();
 
@@ -203,7 +204,7 @@ class StoryController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON with a success message.
      */
-    public function report(Request $request, Story $story) : JsonResponse
+    public function report(Request $request, Story $story): JsonResponse
     {
         $request->validate([
             'reason' => 'required|string|max:255',
@@ -220,5 +221,39 @@ class StoryController extends Controller
         return response()->json([
             'message' => 'Story reported successfully',
         ], 201);
+    }
+
+    /**
+     * Handles the associating of tags to a story.
+     * 
+     * This method validates the tags that should be added to a story,
+     * which then is added to said story model.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * The HTTP request of the story that the tags are added into.
+     * @param \App\Models\Story $story
+     * The story model about to have tags added.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON with either a success or error code plus a message.
+     */
+    public function addTag(Request $request, Story $story): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'tag_id' => 'required|exists:tags,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $tagId = $request->input('tag_id');
+
+        if (!$story->tags()->where('tag_id', $tagId)->exists()) {
+            $story->tags()->attach($tagId);
+            return response()->json(['message' => "Tag added to the story."], 200);
+        } else {
+            return response()->json(['message' => "Tag is already attached to the story."], 200);
+        }
     }
 }
