@@ -54,7 +54,7 @@ class StoryController extends Controller
      */
     public function store(Request $request) : JsonResponse
     {
-        $validator = Validator::make($request->all(). [
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'genre' => 'nullable|string|max:255',
             'length' => 'nullable|integer|min:0',
