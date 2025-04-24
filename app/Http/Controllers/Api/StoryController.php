@@ -23,15 +23,27 @@ class StoryController extends Controller
      * Display a listing of the stories in JSON format.
      * 
      * This method fetches all the stories from the database using the Story model.
-     * Then it eager loads the related categories and tags, and finally returns a JSON
-     * response containing a 'data' array with the list of stories.
+     * Then it eager loads the related categories and tags. The method can also
+     * allow filtering, and finally returns a JSON response containing a 'data' array with the list of stories.
      * 
      * @return \Illuminate\Http\JsonResponse
      * Returns a JSON containing the relevant data
      */
-    public function index() : JsonResponse
+    public function index(Request $request) : JsonResponse
     {
-        $stories = Story::with('category', 'tags')->get();
+        $query = Story::with('category', 'tags');
+
+        if ($request->has('title')) { // Filter by title
+            $searchTerm = $request->input('title');
+            $query->where('title', 'like', '%' . $searchTerm . '%');
+        }
+
+        if ($request->has('category_id')) { // Filter by category
+            $categoryId = $request->input('category_id');
+            $query->where('category_id', $categoryId);
+        }
+
+        $stories = $query->get();
 
         return response()->json([
             'data' => $stories,
