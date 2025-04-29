@@ -72,6 +72,7 @@ class StoryController extends Controller
             'genre' => 'nullable|string|max:255',
             'length' => 'nullable|integer|min:0',
             'content' => 'nullable|string',
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -89,6 +90,7 @@ class StoryController extends Controller
             'genre' => $request->input('genre'),
             'length' => $request->input('length'),
             'content' => $request->input('content'),
+            'description' => $request->input('description'),
             'category_id' => $request->input('category_id'),
         ]);
 
@@ -146,6 +148,7 @@ class StoryController extends Controller
             'genre' => 'nullable|string|max:255',
             'length' => 'nullable|integer|min:0',
             'content' => 'nullable|string',
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',

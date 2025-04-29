@@ -52,6 +52,11 @@ class Story extends Model
          */
         'content',
         /**
+         * The description of the story itself
+         * @var string
+         */
+        'description',
+        /**
          * The ID of the category that the story belongs to
          * @var int
          */
