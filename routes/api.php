@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\ModeratorController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\StoryController;
 use App\Http\Controllers\Api\TagController;
@@ -18,11 +19,12 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group.
 |
 */
+Route::middleware(['auth:sanctum', 'role:moderator'])->prefix('moderator')->group(function () {
+  Route::get('/stories', [ModeratorController::class, 'indexStories'])->name('api.moderator.stories.index');
+  Route::put('/stories/{story}', [ModeratorController::class, 'updateStory'])->name('api.moderator.stories.update');
+  Route::delete('/stories/{story}', [ModeratorController::class, 'destroyStory'])->name('api.moderator.stories.destroy');
 
-// User authentication using Laravel Sanctum. Useful when eventually implementing user identification
-// to moderate the site
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
+  // Add more routes for managing tags, categories, etc.
 });
 
 // These next 3 routes create the set of standard RESTful routes for stories, categories and tags.
