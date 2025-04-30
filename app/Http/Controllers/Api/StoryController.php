@@ -252,11 +252,12 @@ class StoryController extends Controller
 
         $tagId = $request->input('tag_id');
 
-        if (!$story->tags()->where('tag_id', $tagId)->exists()) {
-            $story->tags()->attach($tagId);
-            return response()->json(['message' => "Tag added to the story."], 200);
+        if (!$story->tags()->where('tag_id', $tagId)->wherePivot('status', 'approved')->exists() &&
+            !$story->pendingTags()->where('tag_id', $tagId)->exists()) {
+            $story->pendingTags()->attach($tagId, ['status' => 'pending']);
+            return response()->json(['message' => "Tag addition request submitted for moderation."], 200);
         } else {
-            return response()->json(['message' => "Tag is already attached to the story."], 200);
+            return response()->json(['message' => "Tag is already attached or pending."], 200);
         }
     }
 }

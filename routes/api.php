@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\ModeratorController;
@@ -23,8 +24,9 @@ Route::middleware(['auth:sanctum', 'role:moderator'])->prefix('moderator')->grou
   Route::get('/stories', [ModeratorController::class, 'indexStories'])->name('api.moderator.stories.index');
   Route::put('/stories/{story}', [ModeratorController::class, 'updateStory'])->name('api.moderator.stories.update');
   Route::delete('/stories/{story}', [ModeratorController::class, 'destroyStory'])->name('api.moderator.stories.destroy');
-
-  // Add more routes for managing tags, categories, etc.
+  Route::get('/stories/{story}/pending-tags', [ModeratorController::class, 'indexPendingTags'])->name('api.moderator.stories.pending-tags');
+  Route::post('/stories/{story}/tags/{tag}/approve', [ModeratorController::class, 'approveTag'])->name('api.moderator.stories.tags.approve');
+  Route::delete('/stories/{story}/tags/{tag}/reject', [ModeratorController::class, 'rejectTag'])->name('api.moderator.stories.tags.reject');
 });
 
 // These next 3 routes create the set of standard RESTful routes for stories, categories and tags.
@@ -44,3 +46,7 @@ Route::post('stories/{story}/report', [StoryController::class, 'report'])->name(
 Route::apiResource('reports', ReportController::class);
 
 Route::post('/stories/{story}/tags', [StoryController::class, 'addTag']);
+
+Route::post('/moderator/login', [AuthController::class, 'moderatorLogin'])->name('api.moderator.login');
+
+Route::middleware(['auth:sanctum'])->post('/logout', [AuthController::class, 'logout'])->name('api.logout');

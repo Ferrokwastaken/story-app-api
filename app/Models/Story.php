@@ -96,14 +96,20 @@ class Story extends Model
         return $this->hasMany(ReportStory::class);
     }
 
-    /**
-     * Get the tags associated with the story.
-     * 
-     * This method defines a many-to-many relationship between the Story and Tag models.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function tags() : BelongsToMany {
-        return $this->belongsToMany(Tag::class, 'stories_tags');
+    public function pendingTags(): BelongsToMany 
+    {
+        return $this->belongsToMany(Tag::class, 'stories_tags', 'story_uuid', 'tag_id', 'uuid')
+                    ->wherePivot('status', 'pending');
+    }
+
+    public function approvedTags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'stories_tags', 'story_uuid', 'tag_id', 'uuid')
+                    ->wherePivot('status', 'approved');
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->approvedTags();
     }
 }
