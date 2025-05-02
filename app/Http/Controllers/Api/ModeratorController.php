@@ -9,6 +9,7 @@ use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class ModeratorController extends Controller
 {
@@ -17,8 +18,9 @@ class ModeratorController extends Controller
         $this->middleware(['auth:sanctum', 'role:moderator']);
     }
 
-    public function indexStories (): JsonResponse
+    public function indexStories (Request $request): JsonResponse
     {
+        Log::info('indexStories called by user: ', ['user' => $request->user()]);
         $stories = Story::with('category', 'tags')->paginate(10);
         return response()->json(['data' => $stories]);
     }
@@ -43,6 +45,7 @@ class ModeratorController extends Controller
 
     public function indexPendingTags(Story $story)
     {
+        dd($story->pendingTags());
         $pendingTags = $story->pendingTags()->with('stories')->paginate();
         return response()->json(['data' => $pendingTags]);
     }

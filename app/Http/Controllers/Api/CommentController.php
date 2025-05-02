@@ -52,7 +52,7 @@ class CommentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|string|max:1000',
-            'user_uuid' => 'required|uuid',
+            'user_uuid' => 'nullable|uuid',
         ]);
 
         if ($validator->fails()) {
@@ -64,7 +64,7 @@ class CommentController extends Controller
         $comment = $story->comments()->create([
             'uuid' => Str::uuid(),
             'content' => $request->input('content'),
-            'user_uuid' => $request->input('user_uuid'),
+            'user_uuid' => $request->input('user_uuid') ?? Str::uuid(),
         ]);
 
         return response()->json([

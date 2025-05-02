@@ -20,13 +20,13 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group.
 |
 */
-Route::middleware(['auth:sanctum', 'role:moderator'])->prefix('moderator')->group(function () {
-  Route::get('/stories', [ModeratorController::class, 'indexStories'])->name('api.moderator.stories.index');
-  Route::put('/stories/{story}', [ModeratorController::class, 'updateStory'])->name('api.moderator.stories.update');
-  Route::delete('/stories/{story}', [ModeratorController::class, 'destroyStory'])->name('api.moderator.stories.destroy');
-  Route::get('/stories/{story}/pending-tags', [ModeratorController::class, 'indexPendingTags'])->name('api.moderator.stories.pending-tags');
-  Route::post('/stories/{story}/tags/{tag}/approve', [ModeratorController::class, 'approveTag'])->name('api.moderator.stories.tags.approve');
-  Route::delete('/stories/{story}/tags/{tag}/reject', [ModeratorController::class, 'rejectTag'])->name('api.moderator.stories.tags.reject');
+Route::middleware(['api', 'auth:sanctum'])->prefix('moderator')->group(function () {
+  Route::get('/stories', [ModeratorController::class, 'indexStories'])->name('api.moderator.stories.index')->middleware('role:moderator');
+  Route::put('/stories/{story}', [ModeratorController::class, 'updateStory'])->name('api.moderator.stories.update')->middleware('role:moderator');
+  Route::delete('/stories/{story}', [ModeratorController::class, 'destroyStory'])->name('api.moderator.stories.destroy')->middleware('role:moderator');
+  Route::get('/stories/{story}/pending-tags', [ModeratorController::class, 'indexPendingTags'])->name('api.moderator.stories.pending-tags')->middleware('role:moderator');
+  Route::post('/stories/{story}/tags/{tag}/approve', [ModeratorController::class, 'approveTag'])->name('api.moderator.stories.tags.approve')->middleware('role:moderator');
+  Route::delete('/stories/{story}/tags/{tag}/reject', [ModeratorController::class, 'rejectTag'])->name('api.moderator.stories.tags.reject')->middleware('role:moderator');
 });
 
 // These next 3 routes create the set of standard RESTful routes for stories, categories and tags.
@@ -36,7 +36,7 @@ Route::apiResource('categories', CategoryController::class);
 Route::apiResource('tags', TagController::class);
 
 // The next route manages comments related to a specific story. By using the
-// shallow() method, it simplifies the URL but not requiring the story ID in the URLs for
+// shallow() method, it simplifies the URL by not requiring the story ID in the URLs for
 // comment actions like store, update and destroy.
 Route::resource('stories/{story}/comments', CommentController::class)->shallow();
 

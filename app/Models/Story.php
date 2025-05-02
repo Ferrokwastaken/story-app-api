@@ -70,7 +70,8 @@ class Story extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function category() : BelongsTo {
+    public function category(): BelongsTo
+    {
         return $this->belongsTo(Category::class);
     }
 
@@ -81,7 +82,8 @@ class Story extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function comments() : HasMany {
+    public function comments(): HasMany
+    {
         return $this->hasMany(Comment::class);
     }
 
@@ -92,20 +94,21 @@ class Story extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function reports() : HasMany {
+    public function reports(): HasMany
+    {
         return $this->hasMany(ReportStory::class);
     }
 
-    public function pendingTags(): BelongsToMany 
+    public function pendingTags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'stories_tags', 'story_uuid', 'tag_id', 'uuid')
-                    ->wherePivot('status', 'pending');
+            ->wherePivot('status', 'pending');
     }
 
     public function approvedTags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'stories_tags', 'story_uuid', 'tag_id', 'uuid')
-                    ->wherePivot('status', 'approved');
+            ->wherePivot('status', 'approved');
     }
 
     public function tags(): BelongsToMany
