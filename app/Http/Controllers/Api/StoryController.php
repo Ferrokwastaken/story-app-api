@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Story;
 use App\Models\Tag;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -44,7 +45,15 @@ class StoryController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        $stories = $query->get();
+        $stories = $query->paginate(10)->through(function ($story) {
+            return [
+                'uuid' => $story->uuid,
+                'title' => $story->title,
+                'description' => $story->description,
+                'category' => $story->category,
+                'created_at_formatted' => Carbon::parse($story->created_at)->format('d/m/Y H:i'),
+            ];
+        });
 
         return response()->json([
             'data' => $stories,
@@ -252,8 +261,10 @@ class StoryController extends Controller
 
         $tagId = $request->input('tag_id');
 
-        if (!$story->tags()->where('tag_id', $tagId)->wherePivot('status', 'approved')->exists() &&
-            !$story->pendingTags()->where('tag_id', $tagId)->exists()) {
+        if (
+            !$story->tags()->where('tag_id', $tagId)->wherePivot('status', 'approved')->exists() &&
+            !$story->pendingTags()->where('tag_id', $tagId)->exists()
+        ) {
             $story->pendingTags()->attach($tagId, ['status' => 'pending']);
             return response()->json(['message' => "Tag addition request submitted for moderation."], 200);
         } else {
