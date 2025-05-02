@@ -99,18 +99,44 @@ class Story extends Model
         return $this->hasMany(ReportStory::class);
     }
 
+    /**
+     * Get the tags that are pending approval for the story.
+     *
+     * Defines a many-to-many relationship between a Story and Tags, filtered to include only
+     * tags where the 'status' in the pivot table ('stories_tags') is 'pending'.
+     * You can access these pending tags using `$story->pendingTags`.
+     *
+     * @return BelongsToMany
+     */
     public function pendingTags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'stories_tags', 'story_uuid', 'tag_id', 'uuid')
             ->wherePivot('status', 'pending');
     }
 
+    /**
+     * Get the tags that have been approved for the story.
+     *
+     * Defines a many-to-many relationship between a Story and Tags, filtered to include only
+     * tags where the 'status' in the pivot table ('stories_tags') is 'approved'.
+     * You can access these approved tags using `$story->approvedTags`.
+     *
+     * @return BelongsToMany
+     */
     public function approvedTags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'stories_tags', 'story_uuid', 'tag_id', 'uuid')
             ->wherePivot('status', 'approved');
     }
 
+    /**
+     * Get all approved tags associated with the story.
+     *
+     * This is a convenience method that simply returns the result of the `approvedTags()` relationship.
+     * It allows you to access the story's approved tags using `$story->tags`.
+     *
+     * @return BelongsToMany
+     */
     public function tags(): BelongsToMany
     {
         return $this->approvedTags();

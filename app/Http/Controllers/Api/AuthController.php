@@ -3,12 +3,31 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * The AuthController
+ * 
+ * This class handles both the logging in and out of moderators for the platform.
+ */
 class AuthController extends Controller
 {
-    public function moderatorLogin(Request $request)
+    /**
+     * Allows moderators to login
+     * 
+     * This method validates the input request with the database, and then
+     * creates a token that will be saved in local storage on the frontend until
+     * the user logs out.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * The HTTP instance request to login.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON, indicating either a successful or erroneous login attempt.
+     */
+    public function moderatorLogin(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -28,7 +47,19 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request)
+    /**
+     * Takes care of the logout.
+     * 
+     * This method makes the moderator logout, making sure that
+     * their token is removed in the proccess.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * The HTTP request instance to logout.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON indicating a successful logout.
+     */
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out successfully']);

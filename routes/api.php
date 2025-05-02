@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group.
 |
 */
+
+// All the routes protected by middleware, which belong to the moderators
 Route::middleware(['api', 'auth:sanctum'])->prefix('moderator')->group(function () {
   Route::get('/stories', [ModeratorController::class, 'indexStories'])->name('api.moderator.stories.index')->middleware('role:moderator');
   Route::put('/stories/{story}', [ModeratorController::class, 'updateStory'])->name('api.moderator.stories.update')->middleware('role:moderator');
@@ -45,8 +47,9 @@ Route::post('comments/{comment}/report', [CommentController::class, 'report'])->
 Route::post('stories/{story}/report', [StoryController::class, 'report'])->name('stories.report');
 Route::apiResource('reports', ReportController::class);
 
+// Route for adding tags to stories
 Route::post('/stories/{story}/tags', [StoryController::class, 'addTag']);
 
+// Routes for both the logging in and out for moderators.
 Route::post('/moderator/login', [AuthController::class, 'moderatorLogin'])->name('api.moderator.login');
-
 Route::middleware(['auth:sanctum'])->post('/logout', [AuthController::class, 'logout'])->name('api.logout');

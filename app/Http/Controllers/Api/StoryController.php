@@ -45,7 +45,7 @@ class StoryController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        if ($request->has('start_date') && $request->has('end_date')) {
+        if ($request->has('start_date') && $request->has('end_date')) { // Filter between two dates
             $startDate = $request->input('start_date');
             $endDate = $request->input('end_date');
             $query->whereBetween('created_at', [$startDate, $endDate]);
