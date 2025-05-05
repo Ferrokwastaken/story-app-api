@@ -17,6 +17,7 @@ class ReportStory extends Model
 {
     use HasFactory;
 
+    protected $table = 'reports_stories';
     protected $fillable = [
         /**
          * The UUID of the story that the report is pointing to or being reported.

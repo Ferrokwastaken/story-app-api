@@ -26,7 +26,7 @@ class ReportController extends Controller
         $commentReports = CommentsReport::with('comment')->get();
 
         return response()->json([
-            'story_reports' => $storyReports,
+            'reports_stories' => $storyReports,
             'comment_reports' => $commentReports,
         ]);
     }
