@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 // All the routes protected by middleware, which belong to the moderators
 Route::middleware(['api', 'auth:sanctum'])->prefix('moderator')->group(function () {
+  Route::get('/home', [ModeratorController::class, 'home'])->name('api.moderator.home')->middleware('role:moderator');
   Route::get('/stories', [ModeratorController::class, 'indexStories'])->name('api.moderator.stories.index')->middleware('role:moderator');
   Route::put('/stories/{story}', [ModeratorController::class, 'updateStory'])->name('api.moderator.stories.update')->middleware('role:moderator');
   Route::delete('/stories/{story}', [ModeratorController::class, 'destroyStory'])->name('api.moderator.stories.destroy')->middleware('role:moderator');

@@ -32,9 +32,27 @@ class ModeratorController extends Controller
     }
 
     /**
+     * The home method for the moderator's dashboard.
+     * 
+     * This method loads the pending actions left for moderators to do,
+     * counting them for display on the frontend accordingly.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON response containing all the pending actions.
+     */
+    public function home(): JsonResponse
+    {
+        $pendingTagCount = Tag::whereHas('stories', function ($query) {
+            $query->where('stories_tags.status', 'pending');
+        })->count();
+
+        return response()->json(['pendingTagCount' => $pendingTagCount]);
+    }
+
+    /**
      * Display a paginated list of all stories.
      * 
-     * This methos retrieves all stories from the database, eager loads their associated
+     * This method retrieves all stories from the database, eager loads their associated
      * categories and tags to reduce database queries, and then paginates the results.
      * It also logs the user who called this method for auditing purposes.
      * 
@@ -42,9 +60,9 @@ class ModeratorController extends Controller
      * The incoming HTTP request
      * 
      * @return \Illuminate\Http\JsonResponse
-     * Returns a JSON response containint a 'data' array with the paginated list of stories.
+     * Returns a JSON response containing a 'data' array with the paginated list of stories.
      */
-    public function indexStories (Request $request): JsonResponse
+    public function indexStories(Request $request): JsonResponse
     {
         Log::info('indexStories called by user: ', ['user' => $request->user()]);
         $stories = Story::with('category', 'tags')->paginate(10);
@@ -143,7 +161,7 @@ class ModeratorController extends Controller
         return response()->json(['message' => 'Tag is not pending for this story'], 404);
     }
 
-     /**
+    /**
      * Reject a pending tag for a specific story.
      *
      * This method checks if a given tag is currently pending for a specific story.
