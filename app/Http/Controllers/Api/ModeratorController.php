@@ -194,4 +194,13 @@ class ModeratorController extends Controller
         }
         return response()->json(['message' => 'Tag is not pending for this story'], 404);
     }
+
+    public function indexStoriesWithPendingTags()
+    {
+        $storiesWithPendingTags = Story::whereHas('pendingTags')
+            ->with('pendingTags')
+            ->paginate();
+
+        return response()->json(['data' => $storiesWithPendingTags]);
+    }
 }

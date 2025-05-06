@@ -30,6 +30,7 @@ Route::middleware(['api', 'auth:sanctum'])->prefix('moderator')->group(function 
   Route::get('/stories/{story}/pending-tags', [ModeratorController::class, 'indexPendingTags'])->name('api.moderator.stories.pending-tags')->middleware('role:moderator');
   Route::post('/stories/{story}/tags/{tag}/approve', [ModeratorController::class, 'approveTag'])->name('api.moderator.stories.tags.approve')->middleware('role:moderator');
   Route::delete('/stories/{story}/tags/{tag}/reject', [ModeratorController::class, 'rejectTag'])->name('api.moderator.stories.tags.reject')->middleware('role:moderator');
+  Route::get('/stories-with-pending-tags', [ModeratorController::class, 'indexStoriesWithPendingTags'])->name('api.moderator.stories.with-pending-tags')->middleware('role:moderator');
 
   Route::prefix('reports')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('api.moderator.reports.index');
