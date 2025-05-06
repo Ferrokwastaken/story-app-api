@@ -10,6 +10,7 @@ use App\Models\Story;
 use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -195,12 +196,70 @@ class ModeratorController extends Controller
         return response()->json(['message' => 'Tag is not pending for this story'], 404);
     }
 
-    public function indexStoriesWithPendingTags()
+    /**
+     * Retrieves the stories with pending tags.
+     * 
+     * This method fetches the stories with the associated tags under
+     * the status 'pending', to show them all for the moderator.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON response of the stories with the attached pending tags.
+     */
+    public function indexStoriesWithPendingTags(): JsonResponse
     {
         $storiesWithPendingTags = Story::whereHas('pendingTags')
             ->with('pendingTags')
             ->paginate();
 
         return response()->json(['data' => $storiesWithPendingTags]);
+    }
+
+    /**
+     * Processes the tags actions all at once.
+     * 
+     * This method retrieves the decisions made by a moderator, choosing
+     * to either accept the tags or reject them. All of this under a database
+     * transaction due to the big ammounts of data to process to avoid inconsistencies.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * The HTTP request of the moderator indicating whether to approve or reject the tag.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     * Returns a JSON response with the data indicating whether it has been successful or
+     * not.
+     */
+    public function processTagDecisions(Request $request): JsonResponse
+    {
+        $decisions = $request->input('tagDecisions');
+
+        if (!is_array($decisions)) {
+            return response()->json(['message' => 'Invalid data format'], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($decisions as $storyUuid => $tagDecisionsForStory) {
+                if (is_array($tagDecisionsForStory)) {
+                    $story = Story::where('uuid', $storyUuid)->firstOrFail();
+
+                    foreach ($tagDecisionsForStory as $tagId => $decision) {
+                        if ($decision === 'approve') {
+                            $story->pendingTags()->updateExistingPivot((int) $tagId, ['status' => 'approved']);
+                        } elseif ($decision === 'reject') {
+                            $story->pendingTags()->detach((int) $tagId);
+                        }
+                        // If the decision is null, we do nothing
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Tag decisions processed successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error("Error processing tag decisions: " . $e->getMessage());
+            return response()->json(['message' => 'Failed to process tag decisions', 'error' => $e->getMessage()], 500);
+        }
     }
 }
