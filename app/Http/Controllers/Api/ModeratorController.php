@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateStoryRequest;
+use App\Models\CommentsReport;
+use App\Models\ReportStory;
 use App\Models\Story;
 use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
@@ -46,7 +48,14 @@ class ModeratorController extends Controller
             $query->where('stories_tags.status', 'pending');
         })->count();
 
-        return response()->json(['pendingTagCount' => $pendingTagCount]);
+        $storyReportCount = ReportStory::count();
+        $commentReportCount = CommentsReport::count();
+
+        return response()->json([
+            'pendingTagCount' => $pendingTagCount,
+            'storyReportCount' => $storyReportCount,
+            'commentReportCount' => $commentReportCount,
+        ]);
     }
 
     /**
