@@ -40,6 +40,10 @@ class ReportStory extends Model
          * @var string
          */
         'details',
+        /**
+         * The status of the reports (pending, resolved)
+         */
+        'status',
     ];
 
     /**

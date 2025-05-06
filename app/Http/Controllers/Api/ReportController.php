@@ -7,6 +7,7 @@ use App\Models\CommentsReport;
 use App\Models\ReportStory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
 {
@@ -64,9 +65,30 @@ class ReportController extends Controller
      * TODO: Add the logic to update story and comment reports,
      * like marking as resolved.
      */
-    public function update(Request $request, $id)
+    public function resolve(Request $request, $id)
     {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:resolved',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $reportStory = ReportStory::find($id);
+        $commentsReport = CommentsReport::find($id);
+
+        if ($reportStory) {
+            $reportStory->update(['status' => $request->input('status')]);
+            return response()->json(['message' => 'Story report resolved successfully']);
+        }
+
+        if ($commentsReport) {
+            $commentsReport->update(['status' => $request->input('status')]);
+            return response()->json(['message' => 'Comment report resolved successfully']);
+        }
+
+        return response()->json(['message' => 'Report not found'], 404);
     }
 
     /**

@@ -34,6 +34,11 @@ class CommentsReport extends Model
          * @var string
          */
         'details',
+        /**
+         * The status of the report (pending, resolved)
+         * @var string
+         */
+        'status',
     ];
 
     /**

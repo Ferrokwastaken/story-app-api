@@ -34,7 +34,7 @@ Route::middleware(['api', 'auth:sanctum'])->prefix('moderator')->group(function 
   Route::prefix('reports')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('api.moderator.reports.index');
     Route::get('/{id}', [ReportController::class, 'show'])->name('api.moderator.reports.show');
-    Route::put('/{id}', [ReportController::class, 'update'])->name('api.moderator.reports.update');
+    Route::put('/{id}/resolve', [ReportController::class, 'resolve'])->name('api.moderator.reports.resolve');
     Route::delete('/{id}', [ReportController::class, 'destroy'])->name('api.moderator.reports.destroy');
   });
 });
