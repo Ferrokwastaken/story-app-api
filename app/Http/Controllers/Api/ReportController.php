@@ -23,8 +23,8 @@ class ReportController extends Controller
      */
     public function index() : JsonResponse
     {
-        $storyReports = ReportStory::with('story')->get();
-        $commentReports = CommentsReport::with('comment')->get();
+        $storyReports = ReportStory::with('story')->where('status', 'pending')->get();
+        $commentReports = CommentsReport::with('comment')->where('status', 'pending')->get();
 
         return response()->json([
             'reports_stories' => $storyReports,

@@ -48,8 +48,8 @@ class ModeratorController extends Controller
             $query->where('stories_tags.status', 'pending');
         })->count();
 
-        $storyReportCount = ReportStory::count();
-        $commentReportCount = CommentsReport::count();
+        $storyReportCount = ReportStory::where('status', 'pending')->count();
+        $commentReportCount = CommentsReport::where('status', 'pending')->count();
 
         return response()->json([
             'pendingTagCount' => $pendingTagCount,
