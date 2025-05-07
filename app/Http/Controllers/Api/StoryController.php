@@ -51,6 +51,22 @@ class StoryController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
+        if ($request->has('order_by')) {
+            $orderBy = $request->input('order_by');
+            if ($orderBy === 'title_asc') {
+                $query->orderBy('title', 'asc');
+            } elseif ($orderBy === 'title_desc') {
+                $query->orderBy('title', 'desc');
+            } elseif ($orderBy === 'created_at') {
+                $direction = $request->input('direction', 'desc');
+                $query->orderBy('created_at', $direction);
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
         $stories = $query->paginate(10)->through(function ($story) {
             return [
                 'uuid' => $story->uuid,
