@@ -258,7 +258,6 @@ class ModeratorController extends Controller
             return response()->json(['message' => 'Tag decisions processed successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Illuminate\Support\Facades\Log::error("Error processing tag decisions: " . $e->getMessage());
             return response()->json(['message' => 'Failed to process tag decisions', 'error' => $e->getMessage()], 500);
         }
     }

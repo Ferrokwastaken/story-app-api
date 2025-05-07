@@ -227,11 +227,11 @@ class StoryController extends Controller
         $request->validate([
             'reason' => 'required|string|max:255',
             'details' => 'nullable|string',
-            'user_uuid' => 'required|uuid',
+            'user_uuid' => 'nullable|uuid',
         ]);
 
         $story->reports()->create([
-            'user_uuid' => $request->input('user_uuid'),
+            'user_uuid' => $request->input('user_uuid') ?? Str::uuid(),
             'reason' => $request->input('reason'),
             'details' => $request->input('details'),
         ]);
