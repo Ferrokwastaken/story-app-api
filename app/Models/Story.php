@@ -141,4 +141,14 @@ class Story extends Model
     {
         return $this->approvedTags();
     }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(StoryRating::class, 'story_uuid', 'uuid');
+    }
+
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating');
+    }
 }

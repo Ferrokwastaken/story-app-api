@@ -57,8 +57,9 @@ Route::post('comments/{comment}/report', [CommentController::class, 'report'])->
 Route::post('stories/{story}/report', [StoryController::class, 'report'])->name('stories.report');
 Route::apiResource('reports', ReportController::class);
 
-// Route for adding tags to stories
+// Route for adding tags and rating a story
 Route::post('/stories/{story}/tags', [StoryController::class, 'addTag']);
+Route::post('stories/{story}/rate', [StoryController::class, 'rate'])->name('stories.rate');
 
 // Routes for both the logging in and out for moderators.
 Route::post('/moderator/login', [AuthController::class, 'moderatorLogin'])->name('api.moderator.login');

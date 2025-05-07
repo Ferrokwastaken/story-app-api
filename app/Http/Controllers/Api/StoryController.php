@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Story;
+use App\Models\StoryRating;
 use App\Models\Tag;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
 
 /**
  * The StoryController
@@ -33,7 +35,7 @@ class StoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Story::with('category', 'tags');
+        $query = Story::with('category', 'tags')->withAvg('ratings', 'rating');
 
         if ($request->has('title')) { // Filter by title
             $searchTerm = $request->input('title');
@@ -74,6 +76,7 @@ class StoryController extends Controller
                 'description' => $story->description,
                 'category' => $story->category,
                 'created_at_formatted' => Carbon::parse($story->created_at)->format('d/m/Y H:i'),
+                'average_rating' => round($story->ratings_avg_rating, 1),
             ];
         });
 
@@ -292,5 +295,34 @@ class StoryController extends Controller
         } else {
             return response()->json(['message' => "Tag is already attached or pending."], 200);
         }
+    }
+
+    public function rate(Request $request, string $storyUuid)
+    {
+        if (!Uuid::isValid($storyUuid)) {
+            return response()->json(['message' => 'Invalid story UUID'], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+
+        $ratingValue = $request->input('rating');
+
+        $story = Story::where('uuid', $storyUuid)->first();
+        if (!$story) {
+            return response()->json(['message' => 'Story not found'], 404);
+        }
+
+        $rating = new StoryRating();
+        $rating->story_uuid = $storyUuid;
+        $rating->rating = $ratingValue;
+        $rating->save();
+
+        return response()->json(['message' => 'Rating submitted successfully'], 201);
     }
 }
