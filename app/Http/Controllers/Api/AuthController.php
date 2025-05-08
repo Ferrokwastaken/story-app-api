@@ -38,7 +38,7 @@ class AuthController extends Controller
             $user = Auth::user();
             if ($user->hasRole('moderator') || $user->hasRole('admin')) {
                 $token = $user->createToken('moderator-token')->plainTextToken;
-                return response()->json(['token' => $token, 'message', 'Login successful!']);
+                return response()->json(['token' => $token, 'name' => $user->name, 'message', 'Login successful!']);
             } else {
                 return response()->json(['message' => 'Unauthorized: User is not a moderator'], 401);
             }

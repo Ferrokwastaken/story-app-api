@@ -51,6 +51,7 @@ Route::apiResource('tags', TagController::class);
 // shallow() method, it simplifies the URL by not requiring the story ID in the URLs for
 // comment actions like store, update and destroy.
 Route::resource('stories/{story}/comments', CommentController::class)->shallow();
+Route::delete('/comments/{comment:uuid}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 // These routes handle reporting both a comment and a story
 Route::post('comments/{comment}/report', [CommentController::class, 'report'])->name('comments.report');
