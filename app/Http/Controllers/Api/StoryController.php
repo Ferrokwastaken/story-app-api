@@ -109,7 +109,7 @@ class StoryController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
+            'tags.*' => 'string|max:50',
         ]);
 
         if ($validator->fails()) {
@@ -129,7 +129,23 @@ class StoryController extends Controller
         ]);
 
         if ($request->has('tags')) {
-            $story->tags()->attach($request->input('tags'));
+            foreach ($request->input('tags') as $tagInput) {
+                $tag = null;
+
+                if (is_numeric($tagInput)) {
+                    $tag = Tag::find($tagInput);
+                }
+
+                if (!$tag && is_string($tagInput)) {
+                    $tag = Tag::firstOrCreate(['name' => $tagInput]);
+                }
+
+                if ($tag) {
+                    if (!$story->tags()->where('tag_id', $tag->id)->exists() && !$story->pendingTags()->where('tag_id', $tag->id)->exists()) {
+                        $story->pendingTags()->attach($tag->id, ['status' => 'pending']);
+                    }
+                }
+            }
         }
 
         return response()->json([
